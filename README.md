@@ -93,4 +93,4 @@ A implementação foi feita com apoio de IA generativa (Claude, da Anthropic), a
 ## Equipe
 
 Projeto do grupo da disciplina INF01127 — Engenharia de Software, Instituto de Informática, UFRGS, 2026.
-<!-- Adicione aqui os nomes e links (GitHub/LinkedIn) dos integrantes -->
+Arthur Andrade, Arthur Rigo, Cristopher de Wallau, Lucas Bagolin e Pedro Schuck
