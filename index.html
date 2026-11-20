@@ -980,7 +980,7 @@ h4 { font-size: 0.95rem; font-weight: 600; }
   h1 { font-size: 1.3rem; }
 }
 
-/* ---------- Notifications bell (RF07) ---------- */
+/* ---------- Notifications bell (RF05) ---------- */
 .notif-wrap { position: relative; }
 .notif-bell { position: relative; background: transparent; border: none; color: #fff; font-size: 1.2rem; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
 .notif-bell:hover, .notif-bell.open { background: rgba(255,255,255,0.14); }
@@ -1247,6 +1247,13 @@ img, table { max-width: 100%; }
 
 /* ---------- Turmas (form) — flexible schedule (C4) ---------- */
 #turmas-form-list .turma-form-row { display:flex; flex-direction:column; gap:8px; padding:12px; }
+#turmas-form-list .tf-week { display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:4px 12px; }
+#turmas-form-list .tf-dayrow { display:flex; align-items:center; gap:6px; }
+#turmas-form-list .tf-dayrow label { display:inline-flex; align-items:center; gap:4px; width:58px; font-size:.8rem; font-weight:600; margin:0; cursor:pointer; }
+#turmas-form-list .tf-dayrow label input { width:auto; margin:0; accent-color:var(--ufrgs-blue); }
+#turmas-form-list .tf-dayrow input[type=time] { flex:1 1 80px; min-width:0; padding:4px 6px; }
+#turmas-form-list .tf-dayrow:not(.on) input[type=time] { opacity:.45; }
+#turmas-form-list .tf-hint { font-size:.78rem; color:var(--gray-500); }
 #turmas-form-list .tf-line { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
 #turmas-form-list .tf-line > input, #turmas-form-list .tf-line > select { flex:1 1 140px; min-width:0; }
 #turmas-form-list .tf-line > .tf-vagas-vol, #turmas-form-list .tf-line > .tf-vagas-ben { flex:0 1 120px; }
@@ -1278,6 +1285,14 @@ img, table { max-width: 100%; }
 .btn-danger:hover { filter: brightness(0.92); }
 .ui-toast { position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%) translateY(20px); background: var(--ufrgs-blue); color: #fff; padding: 12px 20px; border-radius: 8px; font-size: 0.88rem; font-weight: 600; box-shadow: 0 8px 24px rgba(0,0,0,0.2); opacity: 0; pointer-events: none; transition: all .25s; z-index: 1001; }
 .ui-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+.br-date { position:relative; display:flex; align-items:stretch; width:100%; }
+.br-date > input[type=text] { flex:1 1 auto; min-width:0; padding-right:38px; }
+.br-date .br-pick { position:absolute; right:0; bottom:0; width:1px; height:1px; opacity:0; pointer-events:none; border:0; padding:0; }
+.br-date .br-btn { position:absolute; right:4px; top:50%; transform:translateY(-50%); background:none; border:0; cursor:pointer; font-size:1rem; padding:2px 4px; line-height:1; }
+.br-date input:disabled ~ .br-btn, .br-date input[readonly] ~ .br-btn { display:none; }
+.br-date input.br-bad { border-color:var(--ufrgs-red, #ED1C24) !important; }
+#turmas-form-list .tf-sched-dates .br-date { flex:1 1 150px; width:auto; }
 </style>
 </head>
 <body>
@@ -1300,7 +1315,8 @@ img, table { max-width: 100%; }
 <header class="site-header">
   <div class="header-inner">
     <a class="logo" href="#" onclick="navigate('catalog'); return false;">
-      <img class="logo-img" id="brand-logo" src="data:image/png;base64,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" alt="UFRGS — PROREXT, Pró-Reitoria de Extensão">
+      <img class="logo-img" id="brand-logo" src="data:image/png;base64,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" alt="UFRGS — PROREXT, Pró-Reitoria de Extensão">
       <div class="logo-text">
         Plataforma de Extensão
         <span>Pró-Reitoria de Extensão · UFRGS</span>
@@ -1552,6 +1568,22 @@ img, table { max-width: 100%; }
     <div class="validation-banner" id="val-banner">⚠ Corrija os campos destacados antes de publicar.</div>
     <div class="success-banner" id="suc-banner">✓ Atividade salva com sucesso!</div>
 
+    <!-- Section: Registro institucional (RN05) — first, because it fills the form -->
+    <div class="form-section">
+      <div class="form-section-title">Registro Institucional</div>
+      <div class="form-field required" id="ff-cod">
+        <label>Código da atividade no sistema de extensão da UFRGS</label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <input type="text" id="f-cod" inputmode="numeric" maxlength="8" placeholder="ex.: 63225" style="flex:1 1 160px" oninput="this.value=this.value.replace(/\D/g,''); clearError('ff-cod'); invalidateCod()" onkeydown="if(event.key==='Enter') verifyCod()">
+          <button type="button" class="btn btn-secondary" id="btn-verify-cod" onclick="verifyCod()">🔎 Verificar código</button>
+        </div>
+        <div class="field-error" id="cod-error">Verifique um código de registro aprovado.</div>
+        <div id="cod-result" style="margin-top:10px"></div>
+        <span class="field-hint">A atividade precisa estar aprovada pela COMEX/CAMEXT/COMGRAD. Ao verificar, título, área, modalidade, coordenação, textos e período são preenchidos a partir do registro oficial; os textos podem ser editados.</span>
+        <details class="demo-hint" style="margin-top:10px"><summary>🧪 Códigos de teste (sistema de extensão simulado)</summary><table class="test-cards" id="test-cods"></table></details>
+      </div>
+    </div>
+
     <!-- Section: Identificação -->
     <div class="form-section">
       <div class="form-section-title">Identificação</div>
@@ -1745,18 +1777,6 @@ img, table { max-width: 100%; }
       <span class="field-hint divulg-only">Em "Divulgação apenas", as turmas são opcionais e servem só para informar os horários.</span>
     </div>
 
-    <!-- Section: Código Institucional -->
-    <div class="form-section">
-      <div class="form-section-title">Registro Institucional</div>
-      <div class="form-field required" id="ff-cod">
-        <label>Código de Registro</label>
-        <input type="text" id="f-cod" placeholder="ex: 63225" oninput="clearError('ff-cod')">
-        <div class="field-error" id="cod-error">Informe o código de registro aprovado.</div>
-        <small style="font-size:0.75rem;color:var(--gray-500);margin-top:4px;display:block">
-          Código da atividade no sistema de extensão da UFRGS (ex.: 63225). A atividade deve ter sido aprovada pela COMEX/CAMEXT/COMGRAD.
-        </small>
-      </div>
-    </div>
   </div>
 
   <div class="form-actions">
@@ -1853,6 +1873,57 @@ img, table { max-width: 100%; }
      JAVASCRIPT
      ============================================================ -->
 <script>
+
+/* Datas no padrão brasileiro (dd/mm/aaaa) em todos os campos de data.
+   O campo nativo segue o idioma do navegador (mm/dd/aaaa em inglês); aqui ele vira um campo de texto
+   com máscara e um botão de calendário. O .value continua lendo e gravando AAAA-MM-DD para o resto do código. */
+(function () {
+  const NATIVE = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value');
+  const toISO = t => {
+    t = (t || '').trim();
+    if (/^\d{4}-\d{2}-\d{2}$/.test(t)) return t;
+    const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(t);
+    if (!m) return '';
+    const d = new Date(+m[3], +m[2] - 1, +m[1]);
+    return d.getFullYear() === +m[3] && d.getMonth() === +m[2] - 1 && d.getDate() === +m[1] ? `${m[3]}-${m[2]}-${m[1]}` : '';
+  };
+  const toBR = iso => /^\d{4}-\d{2}-\d{2}$/.test(iso || '') ? iso.split('-').reverse().join('/') : (iso || '');
+  function enhance(el) {
+    if (el.dataset.br) return;
+    el.dataset.br = '1';
+    const iso0 = NATIVE.get.call(el), min = el.getAttribute('min'), max = el.getAttribute('max');
+    el.type = 'text'; el.inputMode = 'numeric'; el.placeholder = 'dd/mm/aaaa'; el.maxLength = 10; el.autocomplete = 'off';
+    Object.defineProperty(el, 'value', {
+      configurable: true,
+      get() { return toISO(NATIVE.get.call(this)); },
+      set(v) { NATIVE.set.call(this, toBR(v)); this.classList.remove('br-bad'); }
+    });
+    NATIVE.set.call(el, toBR(iso0));
+    const wrap = document.createElement('span'); wrap.className = 'br-date';
+    el.parentNode.insertBefore(wrap, el); wrap.appendChild(el);
+    const pick = document.createElement('input'); pick.type = 'date'; pick.tabIndex = -1; pick.className = 'br-pick';
+    if (min) pick.min = min; if (max) pick.max = max;
+    const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'br-btn'; btn.title = 'Abrir calendário'; btn.textContent = '📅';
+    wrap.appendChild(pick); wrap.appendChild(btn);
+    btn.onclick = () => { NATIVE.set.call(pick, el.value || ''); try { pick.showPicker(); } catch (e) { pick.focus(); pick.click(); } };
+    pick.onchange = () => { el.value = NATIVE.get.call(pick); el.dispatchEvent(new Event('input', { bubbles: true })); el.dispatchEvent(new Event('change', { bubbles: true })); };
+    el.addEventListener('input', e => {
+      if (e.isTrusted) {               // máscara: insere as barras ao digitar
+        let d = NATIVE.get.call(el).replace(/\D/g, '').slice(0, 8);
+        if (d.length > 4) d = d.slice(0, 2) + '/' + d.slice(2, 4) + '/' + d.slice(4);
+        else if (d.length > 2) d = d.slice(0, 2) + '/' + d.slice(2);
+        if (!/^\d{4}-/.test(NATIVE.get.call(el))) NATIVE.set.call(el, d);
+      }
+      const raw = NATIVE.get.call(el);
+      el.classList.toggle('br-bad', raw.length === 10 && !toISO(raw));
+    }, true);
+  }
+  const scan = root => (root.querySelectorAll ? root.querySelectorAll('input[type="date"]:not(.br-pick)') : []).forEach(enhance);
+  document.addEventListener('DOMContentLoaded', () => scan(document));
+  new MutationObserver(ms => ms.forEach(m => m.addedNodes.forEach(n => { if (n.nodeType === 1) { if (n.matches && n.matches('input[type="date"]:not(.br-pick)')) enhance(n); scan(n); } })))
+    .observe(document.documentElement, { childList: true, subtree: true });
+  window.brDateEnhanceAll = () => scan(document);
+})();
 /* ==========================================
    DATA
    ========================================== */
@@ -1889,7 +1960,7 @@ const ACTIVITIES = [
     inscEnd:  daysFromNow(20),
     execStart: daysFromNow(35),
     execEnd:   daysFromNow(90),
-    cod: 'EXT-2026-00142',
+    cod: '60142',
     status: 'published',
     coordId: 'coordinator'
   },
@@ -1913,7 +1984,7 @@ const ACTIVITIES = [
     inscEnd:  daysFromNow(-5),
     execStart: daysFromNow(3),
     execEnd:   daysFromNow(150),
-    cod: 'EXT-2026-00089',
+    cod: '60089',
     status: 'published',
     coordId: 'coordinator'
   },
@@ -1937,7 +2008,7 @@ const ACTIVITIES = [
     inscEnd:  daysFromNow(40),
     execStart: daysFromNow(50),
     execEnd:   daysFromNow(230),
-    cod: 'EXT-2026-00201',
+    cod: '60201',
     status: 'published',
     coordId: 'other'
   },
@@ -1961,7 +2032,7 @@ const ACTIVITIES = [
     inscEnd:  daysFromNow(15),
     execStart: daysFromNow(20),
     execEnd:   daysFromNow(300),
-    cod: 'EXT-2026-00178',
+    cod: '60178',
     status: 'published',
     coordId: 'other'
   },
@@ -1985,7 +2056,7 @@ const ACTIVITIES = [
     inscEnd:  daysFromNow(10),
     execStart: daysFromNow(15),
     execEnd:   daysFromNow(75),
-    cod: 'EXT-2026-00156',
+    cod: '60156',
     status: 'published',
     coordId: 'other'
   },
@@ -2009,7 +2080,7 @@ const ACTIVITIES = [
     inscEnd:  daysFromNow(-30),
     execStart: daysFromNow(-25),
     execEnd:   daysFromNow(-3),
-    cod: 'EXT-2026-00074',
+    cod: '60074',
     status: 'published',
     coordId: 'other'
   },
@@ -2034,7 +2105,7 @@ const ACTIVITIES = [
     extensions: [{ at: daysFromNow(-1), from: daysFromNow(20), to: daysFromNow(25), reopened: false }],
     execStart: daysFromNow(32),
     execEnd:   daysFromNow(180),
-    cod: 'EXT-2026-00219',
+    cod: '60219',
     status: 'published',
     coordId: 'coordinator'
   },
@@ -2058,14 +2129,14 @@ const ACTIVITIES = [
     inscEnd:  daysFromNow(-6),
     execStart: daysFromNow(12),
     execEnd:   daysFromNow(130),
-    cod: 'EXT-2026-00233',
+    cod: '60233',
     status: 'published',
     coordId: 'other'
   },
   {
     id: 9,
     turmas: [
-      { id: 'ti1', label: 'Turma Única', day: 'Quarta-feira', time: '18h30–20h30', vagas: 8 },
+      { id: 'ti1', label: 'Turma Única', days: ['Quarta-feira', 'Sábado', 'Domingo'], time: '', slots: [{ day: 'Quarta-feira', t1: '18:30', t2: '20:30' }, { day: 'Sábado', t1: '09:00', t2: '12:00' }, { day: 'Domingo', t1: '14:00', t2: '16:00' }], vagas: 8 },
     ],
     title: 'Rádio Comunitária Universitária — Produção de Podcasts',
     area: 'Comunicação',
@@ -2081,7 +2152,7 @@ const ACTIVITIES = [
     inscEnd:  daysFromNow(-20),
     execStart: daysFromNow(-10),
     execEnd:   daysFromNow(80),
-    cod: 'EXT-2026-00187',
+    cod: '60187',
     status: 'published',
     coordId: 'other'
   },
@@ -2105,7 +2176,7 @@ const ACTIVITIES = [
     inscEnd:  daysFromNow(-25),
     execStart: daysFromNow(-15),
     execEnd:   daysFromNow(60),
-    cod: 'EXT-2026-00164',
+    cod: '60164',
     status: 'published',
     coordId: 'coordinator'
   },
@@ -2286,9 +2357,11 @@ const CANDIDACIES = {
   ],
   12: [
     { id: 'l1', name: 'Joana Silva', email: 'joana.silva@email.com', mod: 'ben', age: 68, escolaridade: 'Médio completo', appliedAt: daysFromNow(-120), state: 'accepted', turmaId: 'tl1', studentId: 'ext1', answers: {} },
+    { id: 'l3', name: 'Maria Clara Santos', email: 'maria.santos@ufrgs.br', mod: 'ben', age: 22, escolaridade: 'Superior incompleto', appliedAt: daysFromNow(-50), decidedAt: daysFromNow(-40), state: 'rejected', turmaId: 'tl1', studentId: 'student', answers: {} },
     { id: 'l2', name: 'Pedro Henrique Lima', email: 'pedro.lima@ufrgs.br', mod: 'ben', age: 29, escolaridade: 'Superior completo', appliedAt: daysFromNow(-3), state: 'analysis', turmaId: 'tl1', studentId: 'u2', answers: {} },
   ],
   15: [
+    { id: 'm3', name: 'Maria Clara Santos', email: 'maria.santos@ufrgs.br', mod: 'ben', age: 22, escolaridade: 'Superior incompleto', appliedAt: daysFromNow(-20), decidedAt: daysFromNow(-10), state: 'rejected', turmaId: null, studentId: 'student', answers: {} },
     { id: 'm1', name: 'Antônio Ribeiro', email: 'antonio.r@email.com', mod: 'ben', age: 72, escolaridade: 'Fundamental incompleto', appliedAt: daysFromNow(-90), state: 'accepted', turmaId: 'tm3', answers: {} },
     { id: 'm2', name: 'Rosa Lima', email: 'rosa.l@email.com', mod: 'ben', age: 52, escolaridade: 'Médio incompleto', appliedAt: daysFromNow(-5), state: 'analysis', turmaId: null, disponibilidade: 'Manhãs', answers: { acessibilidade: 'Hipertensa, em acompanhamento médico.' } },
   ],
@@ -2357,7 +2430,7 @@ const SEED_CONFIG = {
 const TIPOS_ACAO = ['Ação social e comunitária', 'Assessoria e atendimento', 'Consultoria', 'Curso', 'Desenvolvimento de tecnologia e/ou produtos', 'Evento', 'Prestação de serviço', 'Publicação e produto acadêmico'];
 const SEED_TIPO = { 1: 'Curso', 2: 'Assessoria e atendimento', 3: 'Ação social e comunitária', 4: 'Assessoria e atendimento', 5: 'Curso', 6: 'Ação social e comunitária', 7: 'Curso', 8: 'Ação social e comunitária', 9: 'Ação social e comunitária', 10: 'Ação social e comunitária', 99: 'Curso' };
 
-/* Notifications (RF07): sent by e-mail and shown in the platform bell.
+/* Notifications (RF05): sent by e-mail and shown in the platform bell.
    Only the student persona's notifications are visible in the demo. */
 const NOTIFICATIONS = [
   { id: 'n1', studentId: 'student', actId: 8,  type: 'accepted', at: daysFromNow(-5),  read: false },
@@ -2386,6 +2459,43 @@ const NOTIFICATIONS = [
   });
   Object.values(byName).forEach(c => { UFRGS_API[c.card].caso += c.titles.join('; '); });
 })();
+
+/* ==========================================
+   RN05 — simulated registry of the UFRGS extension system (code → approved record)
+   ========================================== */
+const REGISTRO = {};
+function buildRegistry() {
+  ACTIVITIES.filter(a => a.cod).forEach(a => {
+    REGISTRO[a.cod] = { titulo: a.title, coordId: a.coordId, coordenador: a.coordenador, unidade: a.unidade, area: a.area, tipo: a.tipo,
+      resumo: a.desc, objetivos: a.objetivos || '', desenvolvimento: a.desenvolvimento || '',
+      inicio: addDays(a.execStart || todayStr(), -30), fim: addDays(a.execEnd || todayStr(), 90), situacao: 'aprovado' };
+  });
+  const ana = { coordId: 'coordinator', coordenador: 'Profa. Dra. Ana Lúcia Ferreira', unidade: 'Faculdade de Direito' };
+  REGISTRO['64010'] = { ...ana, titulo: 'Programa de Letramento Financeiro para Jovens', area: 'Educação', tipo: 'Curso',
+    resumo: 'Curso de educação financeira para jovens de 15 a 24 anos, com noções de orçamento, crédito, consumo consciente e direitos do consumidor.',
+    objetivos: 'Desenvolver autonomia financeira e prevenir o endividamento de jovens de baixa renda.', desenvolvimento: '',
+    inicio: daysFromNow(10), fim: daysFromNow(200), situacao: 'aprovado', teste: 'Aprovado, sem atividade (use no rascunho de Letramento Financeiro)' };
+  REGISTRO['64020'] = { ...ana, titulo: 'Oficina de Mediação de Conflitos Comunitários', area: 'Direitos Humanos e Justiça', tipo: 'Curso',
+    resumo: 'Oficinas de mediação e resolução pacífica de conflitos para lideranças comunitárias de Porto Alegre.',
+    objetivos: 'Capacitar lideranças comunitárias em técnicas de mediação e comunicação não violenta.',
+    desenvolvimento: 'Encontros semanais com exposição dialogada, simulações e estudos de caso, conduzidos por estudantes de Direito sob supervisão.',
+    inicio: daysFromNow(15), fim: daysFromNow(150), situacao: 'aprovado', teste: 'Aprovado, sem atividade (use em Nova Atividade)' };
+  REGISTRO['64030'] = { ...ana, titulo: 'Clínica de Direitos do Consumidor', area: 'Direitos Humanos e Justiça', tipo: 'Assessoria e atendimento',
+    resumo: '', objetivos: '', desenvolvimento: '', inicio: daysFromNow(30), fim: daysFromNow(300), situacao: 'em tramitação', teste: 'Ainda em tramitação (bloqueia)' };
+  REGISTRO['64040'] = { ...ana, titulo: 'Cine-debate Direito e Sociedade', area: 'Cultura', tipo: 'Evento',
+    resumo: '', objetivos: '', desenvolvimento: '', inicio: daysFromNow(-200), fim: daysFromNow(-100), situacao: 'cancelado', teste: 'Cancelado (bloqueia)' };
+}
+/* Result of checking a code for the current coordinator (activityId = the one being edited, if any) */
+function checkRegistro(code, activityId) {
+  const r = REGISTRO[code];
+  if (!code) return { ok: false, msg: 'Informe o código.' };
+  if (!r) return { ok: false, msg: `O código ${code} não existe no sistema de extensão da UFRGS.` };
+  if (r.situacao !== 'aprovado') return { ok: false, r, msg: `A atividade ${code} está com situação "${r.situacao}". Só atividades aprovadas podem ser publicadas.` };
+  if (r.coordId !== me()) return { ok: false, r, msg: `O código ${code} pertence a outro coordenador (${r.coordenador}).` };
+  const used = ACTIVITIES.find(a => a.cod === code && a.id !== activityId && a.status === 'published');
+  if (used) return { ok: false, r, msg: `O código ${code} já está em uso pela atividade publicada "${used.title}".` };
+  return { ok: true, r };
+}
 
 (function applySeedConfig() {
   const DEFAULT_MOTIV = 'Tenho interesse na área da atividade e disponibilidade no horário da turma escolhida.';
@@ -2546,7 +2656,13 @@ function myCandidacies() {
 function roundOf(a) { return a.round || 1; }
 function candRound(c) { return c.round || 1; }
 /* Rejected in an earlier period and the process was reopened → may apply again (RN10) */
-function canReapply(a, c) { return !!c && c.state === 'rejected' && candRound(c) < roundOf(a) && isInscOpen(a); }
+const REAPPLY_DAYS = 30;   // RN18: continuous activities — new candidacy allowed 30 days after a rejection
+function reapplyDate(c) { return c && c.decidedAt ? addDays(c.decidedAt, REAPPLY_DAYS) : null; }
+function canReapply(a, c) {
+  if (!c || c.state !== 'rejected' || !isInscOpen(a)) return false;
+  if (candRound(c) < roundOf(a)) return true;                                  // reopened period (RN10)
+  return isContinuo(a) && !!c.decidedAt && todayStr() >= reapplyDate(c);        // continuous flow (RN18)
+}
 
 /* ---------- RN10: deadline extension ---------- */
 const MAX_EXTENSIONS = 2, MAX_EXTENSION_DAYS = 7;
@@ -2577,8 +2693,14 @@ function extensionInfo(a) {
 /* ---------- Inscription types (C1, C7) and schedules (C4) ---------- */
 function isContinuo(a) { return a && a.inscTipo === 'continuo'; }
 function isDivulg(a) { return a && a.inscTipo === 'divulgacao'; }
-const DIAS = ['Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
-const DIA_CURTO = { 'Segunda-feira': 'seg', 'Terça-feira': 'ter', 'Quarta-feira': 'qua', 'Quinta-feira': 'qui', 'Sexta-feira': 'sex', 'Sábado': 'sáb' };
+const DIAS = ['Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado', 'Domingo'];
+const DIA_CURTO = { 'Segunda-feira': 'seg', 'Terça-feira': 'ter', 'Quarta-feira': 'qua', 'Quinta-feira': 'qui', 'Sexta-feira': 'sex', 'Sábado': 'sáb', 'Domingo': 'dom' };
+/* RF25: horário semanal por dia (cada dia pode ter seu horário) */
+function turmaSlots(t) {
+  if (t.slots && t.slots.length) return t.slots;
+  const [t1, t2] = parseTime(t.time);
+  return (t.days || []).map(day => ({ day, t1, t2 }));
+}
 function daysText(days) {
   if (!days || !days.length) return '';
   if (days.length === 1) return days[0];
@@ -2589,8 +2711,13 @@ function turmaWhen(t, a) {
   const dated = (a && a.sched === 'datas') || t.dateStart;
   const when = dated
     ? (t.dateEnd && t.dateEnd !== t.dateStart ? `${fmtDate(t.dateStart)} a ${fmtDate(t.dateEnd)}` : fmtDate(t.dateStart))
-    : daysText(t.days);
-  return [when, t.time, t.obs].filter(Boolean).join(' · ');
+    : null;
+  if (when !== null) return [when, t.time, t.obs].filter(Boolean).join(' · ');
+  const sl = turmaSlots(t);
+  const same = sl.length && sl.every(x => x.t1 === sl[0].t1 && x.t2 === sl[0].t2);
+  const sched = same ? [daysText(sl.map(x => x.day)), fmtTimeRange(sl[0].t1, sl[0].t2)].filter(Boolean).join(' · ')
+                     : sl.map(x => `${DIA_CURTO[x.day] || x.day} ${fmtTimeRange(x.t1, x.t2)}`.trim()).join(', ');
+  return [sched || daysText(t.days), t.obs].filter(Boolean).join(' · ');
 }
 /* RN12 (period) / C1 (continuous): may the coordinator accept or reject right now? */
 function canDecideNow(a) {
@@ -2977,7 +3104,8 @@ function renderDetail(id) {
           ${canCancel ? `<button class="btn btn-ghost" style="color:var(--danger)" onclick="cancelCandidacy(${a.id})">🗑 Cancelar candidatura</button>` : ''}
         </div>
         ${canCancel && mods(a).length > 1 ? `<p style="font-size:0.78rem;color:var(--gray-500);margin-top:8px">Quer trocar a forma de participação? Cancele esta inscrição e inscreva-se novamente na outra, até ${fmtDate(a.inscEnd)}.</p>` : ''}
-        ${!canCancel ? `<p style="font-size:0.78rem;color:var(--gray-500);margin-top:8px">O prazo de inscrição encerrou — cancelamento não disponível.</p>` : ''}
+        ${mine.state === 'rejected' && isContinuo(a) && isInscOpen(a) && mine.decidedAt ? `<p style="font-size:0.8rem;color:var(--gray-700);margin-top:8px">Você poderá se candidatar novamente a partir de <strong>${fmtDate(reapplyDate(mine))}</strong> (${REAPPLY_DAYS} dias após a decisão).</p>` : ''}
+        ${!canCancel && mine.state === 'analysis' ? `<p style="font-size:0.78rem;color:var(--gray-500);margin-top:8px">O prazo de inscrição encerrou — cancelamento não disponível.</p>` : ''}
       </div>`;
   } else if (currentUser && currentUser.role === 'coordinator') {
     actionHtml = a.coordId === me()
@@ -3202,6 +3330,14 @@ function renderCreateForm(id) {
   set('f-insc-open', a && a.inscOpen);   set('f-insc-end', a && a.inscEnd);
   set('f-exec-start', a && a.execStart); set('f-exec-end', a && a.execEnd);
   set('f-cod', a && a.cod);
+  renderTestCods();
+  document.getElementById('cod-result').innerHTML = '';
+  codVerified = null; setRegistryLock(false);
+  const codInput = document.getElementById('f-cod');
+  const lockedCod = !!(a && a.status === 'published');
+  codInput.readOnly = lockedCod; codInput.style.background = lockedCod ? 'var(--gray-50)' : '';
+  document.getElementById('btn-verify-cod').style.display = lockedCod ? 'none' : '';
+  if (a && a.cod && REGISTRO[a.cod] && REGISTRO[a.cod].coordId === me()) verifyCod();
   charCount('f-title','cc-title',120);
   charCount('f-desc','cc-desc',2000);
 
@@ -3227,6 +3363,48 @@ function renderCreateForm(id) {
   // a published activity keeps its inscription type (changing it would invalidate existing candidacies)
   document.querySelectorAll('input[name="f-insc-tipo"]').forEach(r => { r.disabled = !!published; });
 }
+/* ---------- RN05: verify the registry code and fill the form ---------- */
+let codVerified = null;   // code verified in the current form
+function invalidateCod() { codVerified = null; document.getElementById('cod-result').innerHTML = ''; setRegistryLock(false); }
+function setRegistryLock(lock) {
+  ['f-title', 'f-area', 'f-tipo'].forEach(id => {
+    const el = document.getElementById(id);
+    el.disabled = lock; el.style.background = lock ? 'var(--gray-50)' : '';
+  });
+}
+function renderTestCods() {
+  document.getElementById('test-cods').innerHTML = Object.entries(REGISTRO)
+    .filter(([c, r]) => r.coordId === me() || r.teste || c === '63225')
+    .map(([c, r]) => `<tr onclick="document.getElementById('f-cod').value='${c}'; verifyCod()"><td><code>${c}</code></td><td>${r.titulo}<br><span style="color:var(--gray-500)">${r.teste || (r.coordId === me() ? 'Aprovado — sua atividade já cadastrada' : 'De outro coordenador e já em uso (bloqueia)')}</span></td></tr>`).join('');
+}
+function verifyCod() {
+  const code = document.getElementById('f-cod').value.trim();
+  const box = document.getElementById('cod-result');
+  const res = checkRegistro(code, editingId);
+  if (!res.ok) {
+    codVerified = null; setRegistryLock(false);
+    box.innerHTML = `<div class="warn-box" style="margin:0;color:var(--danger);border-color:var(--danger);background:var(--danger-bg)">✖ ${res.msg}</div>`;
+    return false;
+  }
+  const r = res.r;
+  codVerified = code;
+  const set = (id, v) => { const el = document.getElementById(id); if (el) el.value = v || ''; };
+  set('f-title', r.titulo); set('f-area', r.area); set('f-tipo', r.tipo);
+  // texts come from the registry but stay editable; only fill empty fields so edits are kept
+  [['f-desc', r.resumo], ['f-objetivos', r.objetivos], ['f-desenv', r.desenvolvimento]].forEach(([id, v]) => {
+    const el = document.getElementById(id); if (el && !el.value.trim()) el.value = v || '';
+  });
+  if (!document.getElementById('f-exec-start').value) set('f-exec-start', r.inicio);
+  if (!document.getElementById('f-exec-end').value) set('f-exec-end', r.fim);
+  charCount('f-title', 'cc-title', 120); charCount('f-desc', 'cc-desc', 2000);
+  setRegistryLock(true);
+  ['ff-title', 'ff-area', 'ff-tipo', 'ff-desc'].forEach(clearError);
+  box.innerHTML = `<div class="info-box">✔ <strong>Atividade ${code} aprovada</strong> — ${r.titulo}<br>
+    Coordenação: ${r.coordenador} · ${r.unidade} · Período aprovado: ${fmtDate(r.inicio)} a ${fmtDate(r.fim)}<br>
+    <span style="font-size:0.75rem">Título, área e modalidade vêm do registro oficial. Resumo, objetivos e desenvolvimento podem ser editados.</span></div>`;
+  return true;
+}
+
 function formInscTipo() { return (document.querySelector('input[name="f-insc-tipo"]:checked') || {}).value || 'periodo'; }
 function formSched() { return (document.querySelector('input[name="f-sched"]:checked') || {}).value || 'semanal'; }
 /* C1/C7: show only the fields of the chosen inscription type */
@@ -3294,11 +3472,14 @@ function addTurmaRow(data) {
       <input class="tf-vagas-ben" type="number" placeholder="Vagas benef." title="Vagas de beneficiário" min="0" step="1" value="${d.vagasBen || ''}" oninput="updateVagasTotal()">
       <button type="button" class="btn-remove-turma" onclick="removeTurmaRow('${id}')" title="Remover turma">✕</button>
     </div>
-    <div class="tf-line tf-sched-week"><span class="tf-lbl">Dias:</span><div class="tf-days">${DIAS.map(dd =>
-      `<label><input type="checkbox" class="tf-dayck" value="${dd}" ${(d.days || []).includes(dd) ? 'checked' : ''}>${DIA_CURTO[dd]}</label>`).join('')}</div></div>
+    <div class="tf-sched-week"><div class="tf-hint" style="margin:2px 0 4px">Marque os dias e o horário de cada um (valem durante todo o período de execução):</div><div class="tf-week">${DIAS.map(dd => {
+      const sl = turmaSlots(d).find(x => x.day === dd); const on = !!sl;
+      return `<div class="tf-dayrow${on ? ' on' : ''}"><label><input type="checkbox" class="tf-dayck" value="${dd}" ${on ? 'checked' : ''} onchange="onDayToggle(this)">${DIA_CURTO[dd]}</label><input class="tf-dt1" type="time" title="Início (${dd})" value="${on ? sl.t1 : ''}" ${on ? '' : 'disabled'}><span class="tf-lbl">às</span><input class="tf-dt2" type="time" title="Término (${dd})" value="${on ? sl.t2 : ''}" ${on ? '' : 'disabled'}></div>`; }).join('')}</div></div>
     <div class="tf-line tf-sched-dates"><span class="tf-lbl">De</span><input class="tf-d1" type="date" value="${d.dateStart || ''}"><span class="tf-lbl">até</span><input class="tf-d2" type="date" value="${d.dateEnd || ''}"></div>
+    <div class="tf-line tf-sched-dates tf-time-line">
+      <span class="tf-lbl">Das</span><input class="tf-t1" type="time" title="Hora de início" value="${parseTime(d.time)[0]}"><span class="tf-lbl">às</span><input class="tf-t2" type="time" title="Hora de término" value="${parseTime(d.time)[1]}">
+    </div>
     <div class="tf-line">
-      <input class="tf-time" type="text" placeholder="Horário (ex.: 14h00–16h00)" value="${d.time || ''}">
       <input class="tf-obs" type="text" placeholder="Observação (opcional, ex.: e um sábado por mês)" value="${d.obs || ''}">
     </div>`;
   document.getElementById('turmas-form-list').appendChild(row);
@@ -3317,19 +3498,68 @@ function removeTurmaRow(id) {
   updateVagasTotal();
 }
 
+/* RF25: horário da turma em dois campos (início e término) */
+function parseTime(str) {
+  const m = /(\d{1,2})h(\d{2})?\s*[–-]\s*(\d{1,2})h(\d{2})?/.exec(str || '');
+  if (!m) return ['', ''];
+  const z = (h, mi) => String(h).padStart(2, '0') + ':' + (mi || '00');
+  return [z(m[1], m[2]), z(m[3], m[4])];
+}
+function fmtTimeRange(t1, t2) {
+  if (!t1 || !t2) return '';
+  const f = t => t.replace(':', 'h');
+  return f(t1) + '–' + f(t2);
+}
+/* RN28 + RF25: consistência das turmas; devolve lista de mensagens */
+function turmaProblems(ts, sc, eS, eE, full) {
+  const out = [];
+  const chk = (lbl, t1, t2, need) => {
+    if ((t1 && !t2) || (!t1 && t2)) out.push(`${lbl}: informe a hora de início e a de término.`);
+    else if (t1 && t2 && t2 <= t1) out.push(`${lbl}: a hora de término (${t2}) deve ser depois da hora de início (${t1}).`);
+    else if (need && !t1) out.push(`${lbl}: informe o horário.`);
+  };
+  ts.forEach(t => {
+    const n = t.label;
+    if (sc === 'datas') {
+      chk(n, t.t1, t.t2, full);
+      if (full && !t.dateStart) out.push(`${n}: informe a data.`);
+      if (t.dateStart && t.dateEnd && t.dateEnd < t.dateStart) out.push(`${n}: a data final deve ser igual ou posterior à inicial.`);
+      if (t.dateStart && eS && t.dateStart < eS) out.push(`${n}: começa (${fmtDate(t.dateStart)}) antes do início da execução (${fmtDate(eS)}).`);
+      if (t.dateEnd && eE && t.dateEnd > eE) out.push(`${n}: termina (${fmtDate(t.dateEnd)}) depois do fim da execução (${fmtDate(eE)}).`);
+    } else {
+      if (full && !t.slots.length) out.push(`${n}: marque ao menos um dia da semana.`);
+      t.slots.forEach(x => chk(`${n} (${DIA_CURTO[x.day]})`, x.t1, x.t2, full));
+    }
+  });
+  return out;
+}
+
+function onDayToggle(ck) {
+  const row = ck.closest('.tf-dayrow'), t1 = row.querySelector('.tf-dt1'), t2 = row.querySelector('.tf-dt2');
+  row.classList.toggle('on', ck.checked); t1.disabled = t2.disabled = !ck.checked;
+  if (ck.checked && !t1.value && !t2.value) {   // sugere o horário de outro dia já preenchido
+    const src = Array.from(ck.closest('.tf-week').querySelectorAll('.tf-dayrow.on')).find(r => r !== row && r.querySelector('.tf-dt1').value);
+    if (src) { t1.value = src.querySelector('.tf-dt1').value; t2.value = src.querySelector('.tf-dt2').value; }
+  }
+}
 function getTurmasFromForm() {
   const rows = document.querySelectorAll('#turmas-form-list .turma-form-row');
   return Array.from(rows).map((row, i) => ({
     id:    row.dataset.turmaId || '',
+    slots: formSched() === 'datas' ? [] : Array.from(row.querySelectorAll('.tf-dayrow')).filter(r => r.querySelector('.tf-dayck').checked)
+             .map(r => ({ day: r.querySelector('.tf-dayck').value, t1: r.querySelector('.tf-dt1').value, t2: r.querySelector('.tf-dt2').value })),
     days:  Array.from(row.querySelectorAll('.tf-dayck:checked')).map(x => x.value),
     dateStart: row.querySelector('.tf-d1').value,
     dateEnd:   row.querySelector('.tf-d2').value || row.querySelector('.tf-d1').value,
-    time:  row.querySelector('.tf-time').value.trim(),
+    t1:    row.querySelector('.tf-t1').value,
+    t2:    row.querySelector('.tf-t2').value,
+    time:  formSched() === 'datas' ? fmtTimeRange(row.querySelector('.tf-t1').value, row.querySelector('.tf-t2').value) : '',
     obs:   row.querySelector('.tf-obs').value.trim(),
     vagasVol: parseInt(row.querySelector('.tf-vagas-vol').value) || 0,
     vagasBen: parseInt(row.querySelector('.tf-vagas-ben').value) || 0,
     label: row.querySelector('.tf-label').value.trim() || `Turma ${String.fromCharCode(65 + i)}`
-  })).filter(t => t.days.length || t.dateStart || t.time || t.vagasVol || t.vagasBen || t.obs);
+  })).map(t => { if (t.slots.length) { const a = t.slots[0]; t.time = t.slots.every(x => x.t1 === a.t1 && x.t2 === a.t2) ? fmtTimeRange(a.t1, a.t2) : ''; } return t; })
+    .filter(t => t.days.length || t.dateStart || t.t1 || t.t2 || t.vagasVol || t.vagasBen || t.obs);
 }
 
 /* Total de vagas = soma das vagas das turmas (RN13) */
@@ -3389,7 +3619,7 @@ function persistForm(publish) {
   }
   const a = {
     id: nextActivityId++, ...data,
-    coordenador: currentUser.name, unidade: currentUser.unidade || 'UFRGS',
+    coordenador: currentUser.name, unidade: (REGISTRO[val('f-cod')] || {}).unidade || currentUser.unidade || 'UFRGS',
     status: publish ? 'published' : 'draft', coordId: me()
   };
   ACTIVITIES.push(a);
@@ -3468,20 +3698,38 @@ function validateForm(forPublish) {
       document.getElementById('exec-end-error').textContent = 'O fim da execução deve ser após o início.';
       setError('ff-exec-end'); errors++;
     }
-    if (!document.getElementById('f-cod').value.trim()) { setError('ff-cod'); errors++; }
+    const code = document.getElementById('f-cod').value.trim();
+    const verified = codVerified === code && checkRegistro(code, editingId).ok;
+    if (!verified) {
+      document.getElementById('cod-error').textContent = code ? (checkRegistro(code, editingId).msg || 'Clique em "Verificar código".') : 'Informe e verifique o código de registro aprovado.';
+      setError('ff-cod'); errors++;
+    } else {
+      const r = REGISTRO[code];
+      const eS = document.getElementById('f-exec-start').value, eE = document.getElementById('f-exec-end').value;
+      if ((eS && eS < r.inicio) || (eE && eE > r.fim)) {
+        document.getElementById('exec-end-error').textContent = `A execução deve ficar dentro do período aprovado (${fmtDate(r.inicio)} a ${fmtDate(r.fim)}).`;
+        setError('ff-exec-end'); errors++;
+      }
+    }
     const turmaList = getTurmasFromForm();
     const sc = formSched();
-    const whenOk = t => (sc === 'semanal' ? t.days.length > 0 : (t.dateStart && (!t.dateEnd || t.dateEnd >= t.dateStart))) && t.time;
-    const turmasOk = (divulg ? true : turmaList.length > 0) && turmaList.every(t => whenOk(t) && ms.every(m => (m === 'vol' ? t.vagasVol : t.vagasBen) > 0));
+    const probs = turmaProblems(turmaList, sc, document.getElementById('f-exec-start').value, document.getElementById('f-exec-end').value, !divulg);
+    turmaList.forEach(t => { if (!divulg && !ms.every(m => (m === 'vol' ? t.vagasVol : t.vagasBen) > 0)) probs.push(`${t.label}: informe vagas maiores que zero para cada forma de participação aceita.`); });
+    if (!divulg && turmaList.length === 0) probs.unshift('Adicione ao menos uma turma para publicar.');
     const terr = document.getElementById('turmas-error');
-    terr.textContent = turmaList.length === 0 ? 'Adicione ao menos uma turma para publicar.' : 'Cada turma precisa de dias ou datas, horário e vagas maiores que zero para cada forma de participação aceita.';
-    terr.style.display = turmasOk ? 'none' : 'block';
-    if (!turmasOk) errors++;
+    terr.innerHTML = probs.map(m => '• ' + m).join('<br>');
+    terr.style.display = probs.length ? 'block' : 'none';
+    if (probs.length) errors++;
   } else {
     // rascunho: validate only what was filled in
     const bad = v => v && (isNaN(v) || parseInt(v) <= 0 || !Number.isInteger(parseFloat(v)));
     if (bad(document.getElementById('f-ch').value)) { setError('ff-ch'); errors++; }
     if (bad(document.getElementById('f-ch-vol').value)) { setError('ff-ch-vol'); errors++; }
+    const probs = turmaProblems(getTurmasFromForm(), formSched(), document.getElementById('f-exec-start').value, document.getElementById('f-exec-end').value, false);
+    const terr = document.getElementById('turmas-error');
+    terr.innerHTML = probs.map(m => '• ' + m).join('<br>');
+    terr.style.display = probs.length ? 'block' : 'none';
+    if (probs.length) errors++;
   }
   return errors === 0;
 }
@@ -3630,7 +3878,7 @@ function renderCandidacyRows() {
     return `
     <div class="cand-row">
       <div class="cand-row-name">
-        ${c.name} ${turmaBadge(activity, c.turmaId)}${roundOf(activity) > 1 ? ` <span class="badge" style="background:var(--gray-100);color:var(--gray-700);font-size:0.7rem">${candRound(c)}º período</span>` : ''}${c.expired ? ` <span class="badge" style="background:var(--gray-100);color:var(--gray-700);font-size:0.7rem">⌛ encerrada sem avaliação</span>` : ''}
+        ${c.name} ${turmaBadge(activity, c.turmaId)}${roundOf(activity) > 1 ? ` <span class="badge" style="background:var(--gray-100);color:var(--gray-700);font-size:0.7rem">${candRound(c)}º período</span>` : ''}${c.expired ? ` <span class="badge" style="background:var(--gray-100);color:var(--gray-700);font-size:0.7rem">⌛ encerrada sem avaliação</span>` : ''}${c.previousRejection ? ` <span class="badge" style="background:var(--warning-bg);color:var(--warning);font-size:0.7rem">↺ já rejeitado(a) em ${fmtDate(c.previousRejection)}</span>` : ''}
         <div style="margin-top:4px;display:flex;flex-wrap:wrap;gap:4px;align-items:center">${modBadge(c.mod)}${c.minor || (c.age && c.age < 18) ? '<span class="mod-badge minor-badge">👶 Menor de idade</span>' : ''}${c.answers && c.answers.acessibilidade ? '<span class="mod-badge" style="background:var(--gray-100);color:var(--gray-700)">♿ Acessibilidade</span>' : ''}</div>
         <div class="sub">${c.email} · ${c.mod === 'ben' && c.age ? c.age + ' anos · ' + (c.escolaridade || '') : (c.course || c.escolaridade || '')} · Inscrição: ${fmtDate(c.appliedAt)}</div>
         <button class="link-btn" onclick="toggleCandDetails('${c.id}')">${expandedCands.has(c.id) ? '▴ Ocultar respostas' : '▾ Ver respostas da inscrição'}</button>
@@ -3706,6 +3954,7 @@ function advanceCand(candId, actId, newState) {
   }
   const changed = c.state !== newState;
   c.state = newState;
+  c.decidedAt = todayStr();
   if (changed) {
     notifyCandidate(c, activity);
     showToast(`${c.name} foi notificado(a) por e-mail e na plataforma.`);
@@ -3810,7 +4059,10 @@ function applyBoxHtml(a, reapply) {
   if (!applyState || applyState.actId !== a.id) applyState = { actId: a.id, mod: okMods.length === 1 ? okMods[0] : null };
   if (applyState.mod && !okMods.includes(applyState.mod)) applyState.mod = null;
   const mod = applyState.mod;
-  const head = reapply ? `<p class="warn-box" style="margin:0 0 12px">Sua candidatura não foi aceita no período anterior. As inscrições foram reabertas e você pode se candidatar novamente.</p>` : '';
+  const prevC = myCandidacy(a.id);
+  const head = reapply ? `<p class="warn-box" style="margin:0 0 12px">${candRound(prevC) < roundOf(a)
+      ? 'Sua candidatura não foi aceita no período anterior. As inscrições foram reabertas e você pode se candidatar novamente.'
+      : `Sua candidatura anterior não foi aceita (${fmtDate(prevC.decidedAt)}). Já se passaram ${REAPPLY_DAYS} dias e você pode se candidatar novamente.`}</p>` : '';
   const modCards = options.map(({ m, e }) => `
     <label class="mod-option${e.ok ? '' : ' disabled'}${mod === m ? ' selected' : ''}">
       <input type="radio" name="mod-sel" value="${m}" ${e.ok ? '' : 'disabled'} ${mod === m ? 'checked' : ''} onchange="selectApplyMod(${a.id}, '${m}')">
@@ -3899,6 +4151,7 @@ function submitCandidacy(actId) {
     if (!answers.resposta) return fail('Responda à pergunta do coordenador.');
   }
   candList(actId).push({
+    previousRejection: prev && prev.state === 'rejected' ? (prev.decidedAt || prev.appliedAt) : null,
     id: uid('cand'), name: u.name, email: u.email, course: profileLine(u),
     mod, age: ageOf(u), escolaridade: u.escolaridade, minor: isMinorUser(u), answers,
     termoAceito: mod === 'vol' ? todayStr() : null,
@@ -3910,7 +4163,7 @@ function submitCandidacy(actId) {
   showToast(`Inscrição como ${MOD_LABEL[mod].toLowerCase()} enviada! Acompanhe em "Minhas Inscrições".`);
 }
 
-/* RF05: cancel until inscEnd, after confirmation. The candidacy is deleted,
+/* RF03: cancel until inscEnd, after confirmation. The candidacy is deleted,
    so it leaves "Minhas Inscrições" and the student may apply again while open. */
 function cancelCandidacy(actId) {
   const a = getActivity(actId);
@@ -3980,6 +4233,7 @@ function runScheduler() {
       pending.forEach(c => {
         c.state = 'rejected';
         c.expired = true;
+        c.decidedAt = isContinuo(a) ? a.execEnd : a.execStart;
         NOTIFICATIONS.push({ id: uid('n'), studentId: c.studentId || null, email: c.email, actId: a.id, type: 'expired', at: isContinuo(a) ? a.execEnd : a.execStart, read: false });
       });
       if (a.coordId)
@@ -4050,7 +4304,7 @@ function extendDeadline(a, newEnd, reopen) {
 }
 
 /* ==========================================
-   NOTIFICATIONS (RF07)
+   NOTIFICATIONS (RF05)
    ========================================== */
 let notifOpen = false;
 function myNotifications() {
@@ -4184,6 +4438,7 @@ document.addEventListener('keydown', e => {
    INIT
    ========================================== */
 document.querySelectorAll('img.brand-logo-lg').forEach(img => { img.src = document.getElementById('brand-logo').src; });
+buildRegistry();
 runScheduler();
 renderNav();
 renderCatalog();
